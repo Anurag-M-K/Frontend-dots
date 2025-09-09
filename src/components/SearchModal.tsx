@@ -18,7 +18,7 @@ const mockData: SearchResult[] = [
     type: 'person',
     name: 'Randall Johnsson',
     status: 'Active now',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face'
+    avatar: 'https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg?w=2000'
   },
   {
     id: '2',
@@ -265,7 +265,7 @@ const SearchModal: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-2">
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl p-4 sm:p-6">
+      <div className="bg-white rounded-xl sm:rounded-2xl relative  shadow-lg w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl p-4 sm:p-6">
         {/* Search Bar */}
         <div className="relative  mb-4 sm:mb-0">
           {isCleared ? (
@@ -411,7 +411,7 @@ const SearchModal: React.FC = () => {
           </div>
           
           {/* Settings Dropdown */}
-          <div className="relative flex-shrink-0" ref={settingsRef}>
+          <div className="relative flex-shrink-0 z-50" ref={settingsRef}>
             <button
               onClick={() => setShowSettings(!showSettings)}
               className="p-1.5 cursor-pointer sm:p-2 hover:bg-gray-100 rounded-lg"
@@ -421,8 +421,8 @@ const SearchModal: React.FC = () => {
             </button>
             
             {showSettings && (
-              <div className="absolute right-0 top-full mt-2 w-40 sm:w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                <div className="p-2 sm:p-3 space-y-1">
+              <div className="absolute right-0 top-full mt-2 w-40 sm:w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[9999] pointer-events-auto">
+              <div className="p-2 sm:p-3 space-y-1">
                   <div 
                     className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
                     onClick={() => handleFilterToggle('files')}
@@ -483,10 +483,10 @@ const SearchModal: React.FC = () => {
 
         {/* Search Results */}
         {!isCleared && isFocused && (
-          <div className={`transition-all duration-300 ease-out  ${
-            isClearing ? 'opacity-0 transform translate-y-6 scale-95' : 
-            isOpening ? 'opacity-0 transform -translate-y-6 scale-95' : 
-            'opacity-100 transform translate-y-0 scale-100'
+          <div className={`transition-all duration-300 ease-out relative z-0 ${showSettings ? 'pointer-events-none' : ''} ${
+            isClearing ? ' transform translate-y-6 scale-95' : 
+            isOpening ? ' transform -translate-y-6 scale-95' : 
+            ' transform translate-y-0 scale-100'
           }`}>
           {showResults ? (
             filteredResults.map((result, index) => {
@@ -529,9 +529,9 @@ const SearchModal: React.FC = () => {
                       title="Copy link"
                     >
                       {copiedItem === result.id ? (
-                        <Check className="w-4 h-4 text-green-600" />
+                        <Check className="w-4 h-4 cursor-pointer text-green-600" />
                       ) : (
-                        <Link className="w-4 h-4 text-gray-500" />
+                        <Link className="w-4 h-4 cursor-pointer text-gray-500" />
                       )}
                     </button>
 
@@ -543,13 +543,13 @@ const SearchModal: React.FC = () => {
                       className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
                       title="Open in new tab"
                     >
-                      <ExternalLink className="w-4 h-4 text-gray-500" />
+                      <ExternalLink className="w-4 h-4 cursor-pointer text-gray-500" />
                     </button>
                   </div>
                 )}
 
                 {copiedItem === result.id && (
-                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
+                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap z-20">
                     Link copied!
                   </div>
                 )}
