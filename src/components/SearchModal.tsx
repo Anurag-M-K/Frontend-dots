@@ -282,8 +282,45 @@ const SearchModal: React.FC = () => {
       return aName.localeCompare(bName);
     });
 
+  // Helpers to derive status-based UI for people
+  const parseLastActiveDays = (status?: string): number | null => {
+    if (!status) return null;
+    const lower = status.toLowerCase();
+    if (lower.includes("active now")) return 0;
+    const dayMatch = lower.match(/active\s+(\d+)d\s+ago/);
+    if (dayMatch) return parseInt(dayMatch[1], 10);
+    const weekMatch = lower.match(/active\s+(\d+)w\s+ago/);
+    if (weekMatch) return parseInt(weekMatch[1], 10) * 7;
+    const hourMatch = lower.match(/active\s+(\d+)h\s+ago/);
+    if (hourMatch) return 0; // treat hours as same day (recent)
+    return null;
+  };
+
+  const getDisplayStatus = (status?: string): string | undefined => {
+    const days = parseLastActiveDays(status);
+    if (days !== null && days >= 7) return "Unactivated";
+    return status;
+  };
+
+  const getStatusTextColor = (status?: string): string => {
+    const days = parseLastActiveDays(status);
+    if (days === 0) return "text-green-600";
+    if (days !== null && days >= 7) return "text-red-600";
+    if (days !== null) return "text-yellow-600";
+    return "text-gray-400";
+  };
+
   const getResultIcon = (result: SearchResult) => {
     if (result.type === "person") {
+      const days = parseLastActiveDays(result.status);
+      const dotClass =
+        days === 0
+          ? "bg-green-500"
+          : days !== null && days >= 7
+          ? "bg-red-500"
+          : days !== null
+          ? "bg-yellow-500"
+          : "bg-gray-500";
       return (
         <div className="relative">
           <img
@@ -291,7 +328,7 @@ const SearchModal: React.FC = () => {
             alt={result.name}
             className="w-8 h-8 sm:w-10 sm:h-10 rounded-md object-cover"
           />
-          <div className="absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full border-2 border-white"></div>
+          <div className={`absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 ${dotClass} rounded-full border-2 border-white`}></div>
         </div>
       );
     }
@@ -302,11 +339,7 @@ const SearchModal: React.FC = () => {
     );
   };
 
-  const getStatusColor = (status?: string) => {
-    if (status?.includes("Active now")) return "text-green-600";
-    if (status?.includes("Active")) return "text-gray-500";
-    return "text-gray-400";
-  };
+  const getStatusColor = (status?: string) => getStatusTextColor(status);
 
   // Handle copying link
   const handleCopyLink = async (result: SearchResult) => {
@@ -710,7 +743,7 @@ const SearchModal: React.FC = () => {
                         <div
                         className={`text-xs ${getStatusColor(result.status)}`}
                         >
-                          {result.status}
+                          {getDisplayStatus(result.status)}
                         </div>
                       )}
                       {result.details && (
