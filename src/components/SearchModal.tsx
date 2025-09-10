@@ -317,6 +317,7 @@ const SearchModal: React.FC = () => {
     if (result.type === "person") {
       return (
         <div className="relative">
+
           <img
             src={result.avatar}
             alt={result.name}
@@ -441,7 +442,7 @@ const SearchModal: React.FC = () => {
         {/* Filter Tabs */}
         {!isCleared && isFocused && (
            <div
-             className={`flex items-end border-b-2 border-gray-200 justify-between mb-4 sm:mb-6 transition-all duration-300 ease-out ${
+             className={`flex items-end border-b-2 border-gray-200 justify-between mb-4 sm:mb-6 transition-all duration-300 ease-out relative z-40 ${
                isClearing
                  ? "opacity-0 transform -translate-y-3 scale-95"
                  : isOpening
@@ -555,7 +556,7 @@ const SearchModal: React.FC = () => {
             </div>
 
             {/* Settings Dropdown */}
-            <div className="relative flex-shrink-0 px-4 sm:px-6 z-90" ref={settingsRef}>
+            <div className="relative flex-shrink-0 px-4 sm:px-6 z-50" ref={settingsRef}>
               <button
                 onClick={() => setShowSettings(!showSettings)}
                 className="p-1.5 cursor-pointer sm:p-2 hover:bg-gray-100 rounded-lg"
@@ -565,7 +566,7 @@ const SearchModal: React.FC = () => {
               </button>
 
               {showSettings && (
-                <div className="absolute right-0 top-full mt-2 w-40 sm:w-48 bg-white  rounded-lg shadow-lg z-[9999] pointer-events-auto">
+                <div className="absolute right-0 top-full mt-2 w-40 sm:w-48 bg-white  rounded-lg shadow-lg z-[60] ">
                   <div className="p-2 sm:p-3 space-y-1">
                     <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100  transition-colors">
                       <div className="flex items-center space-x-1.5 sm:space-x-1">
@@ -662,7 +663,7 @@ const SearchModal: React.FC = () => {
         {/* Search Results */}
         {!isCleared && isFocused && (
           <div
-            className={`px-4 sm:px-8  relative z-0 ${
+            className={`px-4 sm:px-8  relative z-10 ${
               showSettings ? "pointer-events-none" : ""
             } ${
               isClearing
@@ -690,7 +691,7 @@ const SearchModal: React.FC = () => {
                 return (
                   <div
                     key={result?.id}
-                    className={`flex items-center border-b border-gray-200 space-x-3 sm:space-x-4  py-2 sm:py-3 hover:bg-gray-50  cursor-pointer animate-fadeInUp ${delayClass} group relative`}
+                    className={`flex items-center space-x-3 sm:space-x-4  py-2 sm:py-3 hover:bg-gray-50 border-b border-gray-200 cursor-pointer animate-fadeInUp ${delayClass}  relative`}
                     onMouseEnter={() => setHoveredItem(result.id)}
                     onMouseLeave={() => setHoveredItem(null)}
                   >
@@ -702,7 +703,7 @@ const SearchModal: React.FC = () => {
                       </div>
                       {result.status && (
                         <div
-                          className={`text-xs ${getStatusColor(result.status)}`}
+                        className={`text-xs ${getStatusColor(result.status)}`}
                         >
                           {result.status}
                         </div>
@@ -717,7 +718,7 @@ const SearchModal: React.FC = () => {
                     {(hoveredItem === result.id ||
                       result.type === "file" ||
                       result.type === "folder") && (
-                      <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -726,11 +727,9 @@ const SearchModal: React.FC = () => {
                           className="p-1.5 hover:bg-gray-200 rounded-full transition-colors relative"
                           title="Copy link"
                         >
-                          {/* {copiedItem === result.id ? ( */}
-                            {/* // <HiCheck className="w-4 h-4 cursor-pointer text-green-600" /> */}
-                          {/* // ) : ( */}
+                     
                             <HiLink className="w-4 h-4  cursor-pointer text-gray-500" />
-                          {/* // )} */}
+                          
                         </button>
 
                         <button
