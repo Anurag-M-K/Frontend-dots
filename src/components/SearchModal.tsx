@@ -3,7 +3,6 @@ import {
   HiFolder,
   HiLink,
   HiExternalLink,
-  HiCheck,
   HiMenu,
 } from "react-icons/hi";
 import { CiUser } from "react-icons/ci";
@@ -16,6 +15,7 @@ import { LuLoaderCircle } from "react-icons/lu";
 
 import { LuSearch } from "react-icons/lu";
 import { FaImage } from "react-icons/fa6";
+import { CgCheck } from "react-icons/cg";
 
 
 interface SearchResult {
@@ -173,7 +173,7 @@ const SearchModal: React.FC = () => {
         setIsTyping(false);
         setShowResults(true);
         setIsOpening(false);
-      }, 500);
+      }, 50);
     } else if (value.length > 0) {
       // Normal typing behavior when not in cleared state
       setIsFocused(true);
@@ -189,7 +189,7 @@ const SearchModal: React.FC = () => {
       typingTimeoutRef.current = setTimeout(() => {
         setIsTyping(false);
         setShowResults(true);
-      }, 500);
+      }, 1000);
     } else {
       // If text is cleared, go back to cleared state
       setIsCleared(true);
@@ -265,23 +265,53 @@ const SearchModal: React.FC = () => {
     });
   };
 
-  const filteredResults = mockData.filter((result) => {
-    // First filter by active tab
-    if (activeTab === "files")
-      return result.type === "file" || result.type === "folder";
-    if (activeTab === "people") return result.type === "person";
-    if (activeTab === "chats") return result.type === "chat";
-    if (activeTab === "lists") return result.type === "list";
+  const filteredResults = mockData
+    .filter((result) => {
+      // First filter by active tab
+      if (activeTab === "files")
+        return result.type === "file" || result.type === "folder";
+      if (activeTab === "people") return result.type === "person";
+      if (activeTab === "chats") return result.type === "chat";
+      if (activeTab === "lists") return result.type === "list";
 
-    // For 'all' tab, filter by enabled filters
-    if (result.type === "person") return filters.people;
-    if (result.type === "file" || result.type === "folder")
-      return filters.files;
-    if (result.type === "chat") return filters.chats;
-    if (result.type === "list") return filters.lists;
+      // For 'all' tab, filter by enabled filters
+      if (result.type === "person") return filters.people;
+      if (result.type === "file" || result.type === "folder")
+        return filters.files;
+      if (result.type === "chat") return filters.chats;
+      if (result.type === "list") return filters.lists;
 
-    return true;
-  });
+      return true;
+    })
+    .sort((a, b) => {
+      // If there's no search query, maintain original order
+      if (!searchQuery.trim()) return 0;
+      
+      const query = searchQuery.toLowerCase();
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+      
+      // Check for exact matches first
+      const aExactMatch = aName === query;
+      const bExactMatch = bName === query;
+      if (aExactMatch && !bExactMatch) return -1;
+      if (!aExactMatch && bExactMatch) return 1;
+      
+      // Check for starts with matches
+      const aStartsWith = aName.startsWith(query);
+      const bStartsWith = bName.startsWith(query);
+      if (aStartsWith && !bStartsWith) return -1;
+      if (!aStartsWith && bStartsWith) return 1;
+      
+      // Check for contains matches
+      const aContains = aName.includes(query);
+      const bContains = bName.includes(query);
+      if (aContains && !bContains) return -1;
+      if (!aContains && bContains) return 1;
+      
+      // If both have same match type, sort alphabetically
+      return aName.localeCompare(bName);
+    });
 
   const getResultIcon = (result: SearchResult) => {
     if (result.type === "person") {
@@ -311,7 +341,22 @@ const SearchModal: React.FC = () => {
 
   // Handle copying link
   const handleCopyLink = async (result: SearchResult) => {
-    const link = `https://example.com/${result.type}/${result.id}`;
+    let link = "";
+    
+    if (result.type === "person" && result.avatar) {
+      // For people, copy the avatar URL
+      link = result.avatar;
+    } else if (result.type === "file") {
+      // For files, create a file path or URL
+      link = `https://example.com/files/${result.name}`;
+    } else if (result.type === "folder") {
+      // For folders, create a folder path
+      link = `https://example.com/folders/${result.name}`;
+    } else {
+      // Fallback to a generic link
+      link = `https://example.com/${result.type}/${result.id}`;
+    }
+    
     try {
       await navigator.clipboard.writeText(link);
       setCopiedItem(result.id);
@@ -323,7 +368,22 @@ const SearchModal: React.FC = () => {
 
   // Handle opening in new tab
   const handleOpenNewTab = (result: SearchResult) => {
-    const link = `https://example.com/${result.type}/${result.id}`;
+    let link = "";
+    
+    if (result.type === "person" && result.avatar) {
+      // For people, open the avatar URL
+      link = result.avatar;
+    } else if (result.type === "file") {
+      // For files, create a file path or URL
+      link = `https://example.com/files/${result.name}`;
+    } else if (result.type === "folder") {
+      // For folders, create a folder path
+      link = `https://example.com/folders/${result.name}`;
+    } else {
+      // Fallback to a generic link
+      link = `https://example.com/${result.type}/${result.id}`;
+    }
+    
     window.open(link, "_blank");
   };
 
@@ -371,7 +431,7 @@ const SearchModal: React.FC = () => {
                   <span className="text-sm text-gray-500 text-md font-medium mb-1">s</span>
                   </div>
                 </div>
-                <span className="text-gray-400 text-md font-medium">quick access</span>
+                <span className="text-gray-400 text-md hidden sm:flex font-medium">quick access</span>
               </div>
           </>
         )}
@@ -495,7 +555,7 @@ const SearchModal: React.FC = () => {
             </div>
 
             {/* Settings Dropdown */}
-            <div className="relative flex-shrink-0 px-4 sm:px-6 z-50" ref={settingsRef}>
+            <div className="relative flex-shrink-0 px-4 sm:px-6 z-90" ref={settingsRef}>
               <button
                 onClick={() => setShowSettings(!showSettings)}
                 className="p-1.5 cursor-pointer sm:p-2 hover:bg-gray-100 rounded-lg"
@@ -505,7 +565,7 @@ const SearchModal: React.FC = () => {
               </button>
 
               {showSettings && (
-                <div className="absolute right-0 top-full mt-2 w-40 sm:w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[9999] pointer-events-auto">
+                <div className="absolute right-0 top-full mt-2 w-40 sm:w-48 bg-white  rounded-lg shadow-lg z-[9999] pointer-events-auto">
                   <div className="p-2 sm:p-3 space-y-1">
                     <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100  transition-colors">
                       <div className="flex items-center space-x-1.5 sm:space-x-1">
@@ -657,20 +717,20 @@ const SearchModal: React.FC = () => {
                     {(hoveredItem === result.id ||
                       result.type === "file" ||
                       result.type === "folder") && (
-                      <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleCopyLink(result);
                           }}
-                          className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors relative"
+                          className="p-1.5 hover:bg-gray-200 rounded-full transition-colors relative"
                           title="Copy link"
                         >
-                          {copiedItem === result.id ? (
-                            <HiCheck className="w-4 h-4 cursor-pointer text-green-600" />
-                          ) : (
-                            <HiLink className="w-4 h-4 cursor-pointer text-gray-500" />
-                          )}
+                          {/* {copiedItem === result.id ? ( */}
+                            {/* // <HiCheck className="w-4 h-4 cursor-pointer text-green-600" /> */}
+                          {/* // ) : ( */}
+                            <HiLink className="w-4 h-4  cursor-pointer text-gray-500" />
+                          {/* // )} */}
                         </button>
 
                         <button
@@ -678,37 +738,53 @@ const SearchModal: React.FC = () => {
                             e.stopPropagation();
                             handleOpenNewTab(result);
                           }}
-                          className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+                          className="p-1.5 flex items-center text-gray-400 hover:bg-gray-200 rounded-lg transition-colors"
                           title="Open in new tab"
                         >
-                          <HiExternalLink className="w-4 h-4 cursor-pointer text-gray-500" />
+                          <HiExternalLink className="w-4 h-4 cursor-pointer text-gray-500" /><span className="text-xs font-medium pl-2 sm:text-sm"> New Tab</span>
                         </button>
                       </div>
                     )}
 
-                    {copiedItem === result.id && (
-                      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap z-20">
-                        Link copied!
-                      </div>
-                    )}
+                      {copiedItem === result.id && (
+                        <div className="absolute -top-10 right-0 flex items-center justify-center bg-black text-white text-xs px-2  rounded whitespace-nowrap z-20">
+                          <CgCheck size={16} className="text-white mr-1"/> Link copied!
+                        </div>
+                      )}
+
                   </div>
+
                  );
                })}
+                 <div className="border-b mb-4  border-gray-200"></div>
+
                </div>
              ) : (
               <div className="space-y-2 sm:space-y-3">
-                {[1, 2, 3, 4, 5].map((index) => (
-                  <div
-                    key={index}
-                    className="flex items-center space-x-3 sm:space-x-4 p-2 sm:p-3 animate-pulse"
-                  >
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-full"></div>
+                {filteredResults.map((result,index) => {
+                    const delayClass =
+                    index === 0
+                      ? ""
+                      : index === 1
+                      ? "animate-delay-100"
+                      : index === 2
+                      ? "animate-delay-200"
+                      : index === 3
+                      ? "animate-delay-300"
+                      : index === 4
+                      ? "animate-delay-400"
+                      : "animate-delay-500";
+                  return <div
+                    key={result?.id}
+                    className={`flex items-center border-b border-gray-200 space-x-3 sm:space-x-4  py-2 sm:py-2 hover:bg-gray-50  cursor-pointer animate-fadeInUp ${delayClass} group relative`}
+                  > 
+                    <div className="w-8 h-6 sm:w-10 sm:h-10 bg-gray-200 rounded-md"></div>
                     <div className="flex-1 space-y-2">
-                      <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-2 sm:h-3 bg-gray-200 rounded w-3/4"></div>
                       <div className="h-2 sm:h-3 bg-gray-200 rounded w-1/2"></div>
                     </div>
                   </div>
-                ))}
+})}
               </div>
             )}
           </div>
