@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+  import React, { useState, useEffect, useRef } from "react";
 import {
   HiFolder,
   HiLink,
@@ -11,7 +11,6 @@ import { GoGear } from "react-icons/go";
 import { IoPlay } from "react-icons/io5";
 
 import { IoChatbubbleOutline } from "react-icons/io5";
-import { LuLoaderCircle } from "react-icons/lu";
 
 import { LuSearch } from "react-icons/lu";
 import { FaImage } from "react-icons/fa6";
@@ -30,20 +29,20 @@ interface SearchResult {
 
 // Custom filled icon components
 const FilledFolder = () => (
-  <div className="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center">
-    <HiFolder className="w-5 h-5 text-gray-500" />
+  <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+    <HiFolder className="w-5 h-5 text-gray-400" />
   </div>
 );
 
 const FilledImage = () => (
-  <div className="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center">
-    <FaImage className="w-5 h-5 text-gray-500" />
+  <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+    <FaImage className="w-5 h-5 text-gray-400" />
   </div>
 );
 
 const FilledVideo = () => (
-  <div className="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center">
-    <IoPlay className="w-5 h-5 text-gray-500" />
+    <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+    <IoPlay className="w-5 h-5 text-gray-400" />
   </div>
 );
 
@@ -232,7 +231,7 @@ const SearchModal: React.FC = () => {
 
     return parts.map((part, index) =>
       regex.test(part) ? (
-        <span key={index} className="bg-orange-200 text-orange-800">
+        <span key={index} className="bg-orange-200">
           {part}
         </span>
       ) : (
@@ -395,7 +394,29 @@ const SearchModal: React.FC = () => {
         <div className="relative px-4 py-4 sm:px-8 mb-4 sm:mb-0">
       {/* Search / Loader Icon */}
       {isTyping ? (
-        <LuLoaderCircle className="absolute top-1/2  transform -translate-y-1/2  text-gray-400 w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+        <div className=" absolute top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5">
+          <svg className="w-full h-full animate-spin" viewBox="0 0 24 24">
+            {/* <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="#d1d5db"
+              strokeWidth="2"
+              fill="none"
+            /> */}
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="#6b7280"
+              strokeWidth="2"
+              fill="none"
+              strokeDasharray="62.83"
+              strokeDashoffset="62.83"
+              className="animate-[borderFill_1s_ease-in-out_infinite] border-loader-circle"
+            />
+          </svg>
+        </div>
       ) : (
         <LuSearch
           size={20}
@@ -409,7 +430,7 @@ const SearchModal: React.FC = () => {
         value={searchQuery}
         onChange={handleSearchChange}
         placeholder="Searching is easier..."
-        className="w-full pl-8 pr-20 py-2.5 sm:py-3 text-sm sm:text-lg font-medium text-black rounded-lg sm:rounded-xl bg-white focus:outline-none"
+        className="w-full pl-8 pr-20 py-2.5 placeholder:text-gray-400 sm:py-3 text-sm sm:text-lg font-medium text-black rounded-lg sm:rounded-xl bg-white focus:outline-none"
       />
 
       {/* Right side: quick access / clear */}
@@ -417,7 +438,7 @@ const SearchModal: React.FC = () => {
         {searchQuery ? (
           <button
             onClick={handleClear}
-            className="cursor-pointer font-medium hover:text-gray-600 text-sm sm:text-base underline"
+            className="cursor-pointer font-medium mr-4 hover:text-gray-600 text-sm sm:text-base underline"
           >
             Clear
           </button>
@@ -450,36 +471,44 @@ const SearchModal: React.FC = () => {
                  : "opacity-100 transform translate-y-0 scale-100"
              }`}
            >
-            <div className="flex px-4 sm:px-8 space-x-4 sm:space-x-6 md:space-x-8 overflow-x-auto">
+            <div className="flex px-4 sm:px-8 space-x-2 sm:space-x-3 md:space-x-4 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab("all")}
                   className={`pb-2 font-medium cursor-pointer border-b-2 whitespace-nowrap text-xs sm:text-sm transition-all duration-200 ease-in-out ${
                     activeTab === "all"
                       ? "border-black font-medium text-black"
-                      : "border-transparent text-gray-400 hover:text-gray-700"
+                      : "border-transparent text-gray-400 hover:text-gray-600 "
                   }`}
                 >
-                All <span className="bg-gray-200  text-gray-400 font-medium px-2 rounded-md">{filteredResults.length}</span>
+                All <span className="bg-gray-200  text-gray-400 font-medium px-1.5 rounded-md">{
+                  mockData.filter((result) => {
+                    if (result.type === "person") return filters.people;
+                    if (result.type === "file" || result.type === "folder") return filters.files;
+                    if (result.type === "chat") return filters.chats;
+                    if (result.type === "list") return filters.lists;
+                    return true;
+                  }).length
+                }</span>
               </button>
               {filters.files && (
                 <button
                   onClick={() => setActiveTab("files")}
-                  className={`pb-2 cursor-pointer border-b-2 flex items-center space-x-1 sm:space-x-2 whitespace-nowrap text-xs sm:text-sm transition-all duration-200 ease-in-out ${
+                  className={`pb-2 cursor-pointer border-b-2 flex items-center space-x-1 whitespace-nowrap text-xs sm:text-sm transition-all duration-200 ease-in-out ${
                     activeTab === "files"
                       ? "border-black font-medium text-black"
                       : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  <MdAttachFile size={20} className="rotate-225" />
-                  <span className="hidden sm:inline  font-medium text-gray-400">
-                    Files <span className="bg-gray-200 text-gray-400 font-medium px-2 rounded-md">{mockData.filter(
+                  <MdAttachFile size={18} className="rotate-225" />
+                  <span className={`hidden sm:inline font-medium ${activeTab === "files" ? "text-black" : "text-gray-400"}`}>
+                    Files <span className={`bg-gray-200 font-medium px-1.5 rounded-md ${activeTab === "files" ? "text-gray-600" : "text-gray-400"}`}>{mockData.filter(
                         (r) =>
                           (r.type === "file" || r.type === "folder") &&
                           filters.files
                       ).length}</span>
                   </span>
                   <span className="sm:hidden">
-                    <span className="bg-gray-200 text-gray-400 font-medium px-2 rounded-md">{mockData.filter(
+                    <span className={`bg-gray-200 font-medium px-1.5 rounded-md ${activeTab === "files" ? "text-gray-600" : "text-gray-400"}`}>{mockData.filter(
                         (r) =>
                           (r.type === "file" || r.type === "folder") &&
                           filters.files
@@ -490,20 +519,20 @@ const SearchModal: React.FC = () => {
               {filters.people && (
                 <button
                   onClick={() => setActiveTab("people")}
-                  className={`pb-2 cursor-pointer border-b-2 flex items-center space-x-1 sm:space-x-2 whitespace-nowrap text-xs sm:text-sm transition-all duration-200 ease-in-out ${
+                  className={`pb-2 cursor-pointer border-b-2 flex items-center space-x-1 whitespace-nowrap text-xs sm:text-sm transition-all duration-200 ease-in-out ${
                     activeTab === "people"
                       ? "border-black font-medium text-black"
                       : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  <CiUser size={20}/>
-                  <span className="hidden sm:inline  font-medium text-gray-400">
-                    People <span className="bg-gray-200 text-gray-400 font-medium px-2 rounded-md">{mockData.filter(
+                  <CiUser size={18}/>
+                  <span className={`hidden sm:inline font-medium ${activeTab === "people" ? "text-black" : "text-gray-400"}`}>
+                    People <span className={`bg-gray-200 font-medium px-1.5 rounded-md ${activeTab === "people" ? "text-gray-600" : "text-gray-400"}`}>{mockData.filter(
                         (r) => r.type === "person" && filters.people
                       ).length}</span>
                   </span>
                   <span className="sm:hidden">
-                    <span className="bg-gray-200 text-gray-400 font-medium px-2 rounded-md">{mockData.filter(
+                    <span className={`bg-gray-200 font-medium px-1.5 rounded-md ${activeTab === "people" ? "text-gray-600" : "text-gray-400"}`}>{mockData.filter(
                         (r) => r.type === "person" && filters.people
                       ).length}</span>
                   </span>
@@ -512,18 +541,18 @@ const SearchModal: React.FC = () => {
               {filters.chats && (
                 <button
                   onClick={() => setActiveTab("chats")}
-                  className={`pb-2 cursor-pointer border-b-2 flex items-center space-x-1 sm:space-x-2 whitespace-nowrap text-xs sm:text-sm transition-all duration-200 ease-in-out ${
+                  className={`pb-2 cursor-pointer border-b-2 flex items-center space-x-1 whitespace-nowrap text-xs sm:text-sm transition-all duration-200 ease-in-out ${
                     activeTab === "chats"
                       ? "border-black font-medium text-black"
                       : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  <IoChatbubbleOutline size={20} className="text-gray-500 rotate-280" />
-                  <span className="hidden sm:inline  font-medium text-gray-400">
-                      Chats <span className="bg-gray-200 text-gray-400 font-medium px-2 rounded-md">{mockData.filter((r) => r.type === "chat" && filters.chats)
+                  <IoChatbubbleOutline size={18} className="text-gray-500 rotate-280" />
+                  <span className={`hidden sm:inline font-medium ${activeTab === "chats" ? "text-black" : "text-gray-400"}`}>
+                      Chats <span className={`bg-gray-200 font-medium px-1.5 rounded-md ${activeTab === "chats" ? "text-gray-600" : "text-gray-400"}`}>{mockData.filter((r) => r.type === "chat" && filters.chats)
                         .length}</span>
                   </span>
-                  <span className="sm:hidden">
+                  <span className={`sm:hidden ${activeTab === "chats" ? "text-black" : "text-gray-400"}`}>
                     {
                       mockData.filter((r) => r.type === "chat" && filters.chats)
                         .length
@@ -534,18 +563,18 @@ const SearchModal: React.FC = () => {
               {filters.lists && (
                 <button
                   onClick={() => setActiveTab("lists")}
-                  className={`pb-2 cursor-pointer border-b-2 flex items-center space-x-1 sm:space-x-1 whitespace-nowrap text-xs sm:text-sm transition-all duration-200 ease-in-out ${
+                  className={`pb-2 cursor-pointer border-b-2 flex items-center space-x-1 whitespace-nowrap text-xs sm:text-sm transition-all duration-200 ease-in-out ${
                     activeTab === "lists"
                       ? "border-black font-medium text-black"
                       : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  <HiMenu size={20} className="text-gray-500  w-3 h-3 sm:w-4 sm:h-4" />{" "}
-                  <span className="hidden sm:inline  font-medium text-gray-400">
-                    Lists <span className="bg-gray-200 text-gray-400 font-medium px-2 rounded-md">{mockData.filter((r) => r.type === "list" && filters.lists)
+                  <HiMenu size={18} className="text-gray-500  w-3 h-3 sm:w-4 sm:h-4" />{" "}
+                  <span className={`hidden sm:inline font-medium ${activeTab === "lists" ? "text-black" : "text-gray-400"}`}>
+                    Lists <span className={`bg-gray-200 font-medium px-1.5 rounded-md ${activeTab === "lists" ? "text-gray-600" : "text-gray-400"}`}>{mockData.filter((r) => r.type === "list" && filters.lists)
                         .length}</span>
                   </span>
-                  <span className="sm:hidden">
+                  <span className={`sm:hidden ${activeTab === "lists" ? "text-black" : "text-gray-400"}`}>
                     {
                       mockData.filter((r) => r.type === "list" && filters.lists)
                         .length
@@ -570,8 +599,8 @@ const SearchModal: React.FC = () => {
                   <div className="p-2 sm:p-3 space-y-1">
                     <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100  transition-colors">
                       <div className="flex items-center space-x-1.5 sm:space-x-1">
-                          <MdAttachFile  size={20} className=" rotate-225 text-gray-500" />
-                        <span className="text-xs sm:text-sm">Files</span>
+                          <MdAttachFile  size={20} className={`rotate-225 text-gray-500`} />
+                        <span className={`text-xs sm:text-sm ${filters.files ? "text-black font-medium" : "text-gray-400 font-medium"}`}>Files</span>
                       </div>
                       <div
                         onClick={() => handleFilterToggle("files")}
@@ -591,8 +620,8 @@ const SearchModal: React.FC = () => {
 
                     <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100  transition-colors">
                       <div className="flex items-center space-x-1.5 sm:space-x-1">
-                        <CiUser size={20} className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
-                        <span className="text-xs sm:text-sm">People</span>
+                        <CiUser size={20} className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-500`} />
+                        <span className={`text-xs sm:text-sm ${filters.people ? "text-black font-medium" : "text-gray-400 font-medium"}`}>People</span>
                       </div>
                       <div
                         onClick={() => handleFilterToggle("people")}
@@ -612,9 +641,9 @@ const SearchModal: React.FC = () => {
 
                     <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100  transition-colors">
                       <div className="flex items-center space-x-1.5 sm:space-x-1">
-                        <IoChatbubbleOutline size={20} className="rotate-280 text-gray-500 w-3 h-3 sm:w-4 sm:h-4" />
+                        <IoChatbubbleOutline size={20} className={`rotate-280 w-3 h-3 sm:w-4 sm:h-4 text-gray-500`} />
 
-                        <span className="text-xs sm:text-sm">Chats</span>
+                        <span className={`text-xs sm:text-sm ${filters.chats ? "text-black font-medium" : "text-gray-400 font-medium"}`}>Chats</span>
                       </div>
                       <div
                         onClick={() => handleFilterToggle("chats")}
@@ -634,8 +663,8 @@ const SearchModal: React.FC = () => {
 
                     <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100  transition-colors">
                       <div className="flex items-center space-x-1.5 sm:space-x-1">
-                        <HiMenu size={20} className="text-gray-500  w-3 h-3 sm:w-4 sm:h-4" />
-                        <span className="text-xs sm:text-sm">Lists</span>
+                        <HiMenu size={20} className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-500`} />
+                        <span className={`text-xs sm:text-sm ${filters.lists ? "text-black font-medium" : "text-gray-400 font-medium"}`}>Lists</span>
                       </div>
                       <div
                         onClick={() => handleFilterToggle("lists")}
@@ -691,7 +720,7 @@ const SearchModal: React.FC = () => {
                 return (
                   <div
                     key={result?.id}
-                    className={`flex items-center space-x-3 sm:space-x-4  py-2 sm:py-3 hover:bg-gray-50 border-b border-gray-200 cursor-pointer animate-fadeInUp ${delayClass}  relative`}
+                    className={`flex items-center space-x-3 sm:space-x-4  py-2 sm:py-3 hover:bg-gray-50 border-b border-gray-200 cursor-pointer animate-fadeInUp ${delayClass} group relative`}
                     onMouseEnter={() => setHoveredItem(result.id)}
                     onMouseLeave={() => setHoveredItem(null)}
                   >
@@ -737,16 +766,16 @@ const SearchModal: React.FC = () => {
                             e.stopPropagation();
                             handleOpenNewTab(result);
                           }}
-                          className="p-1.5 flex items-center text-gray-400 hover:bg-gray-200 rounded-lg transition-colors"
+                          className="p-1.5 cursor-pointer flex items-center text-gray-400 hover:bg-gray-200 rounded-lg transition-colors"
                           title="Open in new tab"
                         >
-                          <HiExternalLink className="w-4 h-4 cursor-pointer text-gray-500" /><span className="text-xs font-medium pl-2 sm:text-sm"> New Tab</span>
+                          <HiExternalLink className="w-4 h-4  text-gray-500" /><span className="text-xs font-medium pl-2 sm:text-sm"> New Tab</span>
                         </button>
                       </div>
                     )}
 
                       {copiedItem === result.id && (
-                        <div className="absolute -top-10 right-0 flex items-center justify-center bg-black text-white text-xs px-2  rounded whitespace-nowrap z-20">
+                        <div className="absolute -top-2 right-18 flex items-center justify-center bg-black text-white text-xs px-2  rounded whitespace-nowrap z-20">
                           <CgCheck size={16} className="text-white mr-1"/> Link copied!
                         </div>
                       )}
@@ -755,7 +784,10 @@ const SearchModal: React.FC = () => {
 
                  );
                })}
+               {filteredResults.length > 0 && (
+
                  <div className="border-b mb-4  border-gray-200"></div>
+               )}
 
                </div>
              ) : (
