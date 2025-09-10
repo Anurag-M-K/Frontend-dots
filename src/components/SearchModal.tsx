@@ -16,6 +16,8 @@ import { IoChatbubbleOutline } from "react-icons/io5";
 import { LuSearch } from "react-icons/lu";
 import { FaImage } from "react-icons/fa6";
 import { CgCheck } from "react-icons/cg";
+import mockDataJson from "../data/mockData.json";
+const mockData = mockDataJson as SearchResult[];
 
 
 interface SearchResult {
@@ -25,7 +27,7 @@ interface SearchResult {
   status?: string;
   details?: string;
   avatar?: string;
-  icon?: React.ReactNode;
+  icon?: string;
 }
 
 // Custom filled icon components
@@ -47,59 +49,19 @@ const FilledVideo = () => (
   </div>
 );
 
-const mockData: SearchResult[] = [
-  {
-    id: "1",
-    type: "person",
-    name: "Randall Johnsson",
-    status: "Active now",
-    avatar:
-      "https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg?w=2000",
-  },
-    {
-      id: "2",
-      type: "folder",
-      name: "Random Michael Folder",
-      details: "12 Files • in Photos • Edited 12m ago",
-      icon: <FilledFolder />,
-    },
-    {
-      id: "3",
-      type: "file",
-      name: "crative_file_frandkies.jpg",
-      details: "in Photos/Assets • Edited 12m ago",
-      icon: <FilledImage />,
-    },
-  {
-    id: "4",
-    type: "person",
-    name: "Kristinge Karand",
-    status: "Active 2d ago",
-    avatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
-  },
-    {
-      id: "5",
-      type: "file",
-      name: "files_krande_michelle.avi",
-      details: "in Videos • Added 12m ago",
-      icon: <FilledVideo />,
-    },
-  {
-    id: "6",
-    type: "person",
-    name: "Anurag MK",
-    details: "Active 2d ago",
-    avatar:"https://imgv3.fotor.com/images/gallery/Realistic-Male-Profile-Picture.jpg"
-  },
-  {
-    id: "7",
-    type: "file",
-    name: "files_krande_michelle.avi",
-    details: "in Videos • Added 12m ago",
-    icon: <FilledVideo />,
-  },
-];
+// Function to get icon component from string
+const getIconComponent = (iconName: string) => {
+  switch (iconName) {
+    case "FilledFolder":
+      return <FilledFolder />;
+    case "FilledImage":
+      return <FilledImage />;
+    case "FilledVideo":
+      return <FilledVideo />;
+    default:
+      return null;
+  }
+};
 
 const SearchModal: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -111,7 +73,7 @@ const SearchModal: React.FC = () => {
   const [showResults, setShowResults] = useState(true);
   const [isCleared, setIsCleared] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [isClearing, setIsClearing] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
   const [isOpening, setIsOpening] = useState(false);
   const [copiedItem, setCopiedItem] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -158,9 +120,9 @@ const SearchModal: React.FC = () => {
     // Only start opening animation if we have text and are in cleared state
     if (value.length > 0 && isCleared) {
       setIsCleared(false);
-      setIsOpening(true);
       setIsFocused(true);
       setIsTyping(true);
+      setIsOpening(true);
       setShowResults(false);
 
       // Clear previous timeout
@@ -196,27 +158,40 @@ const SearchModal: React.FC = () => {
       setIsFocused(false);
       setIsTyping(false);
       setShowResults(false);
-      setIsOpening(false);
     }
   };
 
-  // Handle clear button (immediate; exit handled by motion)
+  // Handle clear button with smooth exit animation
   const handleClear = () => {
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
+    
+    // Start exit animation
+    setIsExiting(true);
     setShowResults(false);
     setIsTyping(false);
     setIsOpening(false);
-    setIsClearing(false);
-    setIsCleared(true);
-    setIsFocused(false);
-    setSearchQuery("");
+    
+    // Set isCleared after a short delay to trigger exit animation
+    setTimeout(() => {
+      setIsCleared(true);
+    }, 50);
+  };
 
-    const input = document.querySelector(
-      'input[type="text"]'
-    ) as HTMLInputElement;
-    if (input) input.blur();
+  // Handle animation completion
+  const handleAnimationComplete = () => {
+    if (isExiting) {
+      setIsFocused(false);
+      setSearchQuery("");
+      setIsExiting(false);
+      setIsOpening(false);
+
+      const input = document.querySelector(
+        'input[type="text"]'
+      ) as HTMLInputElement;
+      if (input) input.blur();
+    }
   };
 
   const highlightText = (text: string, query: string) => {
@@ -311,7 +286,6 @@ const SearchModal: React.FC = () => {
     if (result.type === "person") {
       return (
         <div className="relative">
-
           <img
             src={result.avatar}
             alt={result.name}
@@ -323,7 +297,7 @@ const SearchModal: React.FC = () => {
     }
     return (
       <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
-        {result.icon}
+        {result.icon ? getIconComponent(result.icon as string) : null}
       </div>
     );
   };
@@ -391,14 +365,7 @@ const SearchModal: React.FC = () => {
       {isTyping ? (
         <div className=" absolute top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5">
           <svg className="w-full rotate-spin animate-spin h-full" viewBox="0 0 24 24">
-            {/* <circle
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="#d1d5db"
-              strokeWidth="2"
-              fill="none"
-            /> */}
+            
             <circle
               cx="12"
               cy="12"
@@ -456,16 +423,24 @@ const SearchModal: React.FC = () => {
     </div>
 
         {/* Filter Tabs */}
+        <AnimatePresence>
         {!isCleared && isFocused && (
-           <div
-             className={`flex items-end border-b-2 border-gray-200 justify-between mb-4 sm:mb-6 transition-all duration-300 ease-out relative z-40 ${
-               isClearing
-                 ? "opacity-0 transform -translate-y-3 scale-95"
-                 : isOpening
-                 ? "opacity-0 transform translate-y-3 scale-95"
-                 : "opacity-100 transform translate-y-0 scale-100"
-             }`}
-           >
+          <motion.div
+            key="filter-tabs"
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ 
+              duration: 1.6, 
+              ease: [0.16, 1, 0.3, 1],
+              opacity: { duration: 0.4 },
+              y: { duration: 0.6 },
+              scale: { duration: 0.5 }
+            }}
+            className={`flex items-end border-b-2 border-gray-200 justify-between mb-4 sm:mb-6 relative z-40 ${
+              isOpening ? "transform-gpu" : ""
+            }`}
+          >
             <div className="flex px-4 sm:px-8 space-x-2 sm:space-x-3 md:space-x-4 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab("all")}
@@ -680,21 +655,28 @@ const SearchModal: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>
-          
+          </motion.div>
         )}
+        </AnimatePresence>
 
         {/* Search Results */}
-        <AnimatePresence>
-        {!isCleared && isFocused && (
+        <AnimatePresence onExitComplete={handleAnimationComplete}>
+        {isFocused && !isCleared && (
           <motion.div
-            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+            key="search-results"
+            initial={{ opacity: 0, y: 25, scale: 0.94 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 18, scale: 0.98 }}
-            transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+            exit={{ opacity: 0, y: 25, scale: 0.94 }}
+            transition={{ 
+              duration: 0.7, 
+              ease: [0.16, 1, 0.3, 1],
+              opacity: { duration: 0.5 },
+              y: { duration: 0.7 },
+              scale: { duration: 0.6 }
+            }}
             className={`px-4 sm:px-8 relative z-10 ${
               showSettings ? "pointer-events-none" : ""
-            }`}
+            } ${isOpening ? "transform-gpu" : ""}`}
           >
              {showResults ? (
                <div>

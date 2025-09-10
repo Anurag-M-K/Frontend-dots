@@ -1,0 +1,51 @@
+[
+  {
+    "id": "1",
+    "type": "person",
+    "name": "Randall Johnsson",
+    "status": "Active now",
+    "avatar": "https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg?w=2000"
+  },
+  {
+    "id": "2",
+    "type": "folder",
+    "name": "Random Michael Folder",
+    "details": "12 Files • in Photos • Edited 12m ago",
+    "icon": "FilledFolder"
+  },
+  {
+    "id": "3",
+    "type": "file",
+    "name": "crative_file_frandkies.jpg",
+    "details": "in Photos/Assets • Edited 12m ago",
+    "icon": "FilledImage"
+  },
+  {
+    "id": "4",
+    "type": "person",
+    "name": "Kristinge Karand",
+    "status": "Active 2d ago",
+    "avatar": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face"
+  },
+  {
+    "id": "5",
+    "type": "file",
+    "name": "files_krande_michelle.avi",
+    "details": "in Videos • Added 12m ago",
+    "icon": "FilledVideo"
+  },
+  {
+    "id": "6",
+    "type": "person",
+    "name": "Anurag MK",
+    "details": "Active 2d ago",
+    "avatar": "https://imgv3.fotor.com/images/gallery/Realistic-Male-Profile-Picture.jpg"
+  },
+  {
+    "id": "7",
+    "type": "file",
+    "name": "files_krande_michelle.avi",
+    "details": "in Videos • Added 12m ago",
+    "icon": "FilledVideo"
+  }
+]
