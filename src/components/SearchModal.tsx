@@ -1,4 +1,5 @@
   import React, { useState, useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   HiFolder,
   HiLink,
@@ -199,29 +200,23 @@ const SearchModal: React.FC = () => {
     }
   };
 
-  // Handle clear button
+  // Handle clear button (immediate; exit handled by motion)
   const handleClear = () => {
-    setIsClearing(true);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
     setShowResults(false);
+    setIsTyping(false);
+    setIsOpening(false);
+    setIsClearing(false);
+    setIsCleared(true);
+    setIsFocused(false);
+    setSearchQuery("");
 
-    // Animate the clearing transition
-    setTimeout(() => {
-      setSearchQuery("");
-      setIsTyping(false);
-      setIsFocused(false);
-      setIsCleared(true);
-      setIsClearing(false);
-
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-      }
-
-      // Blur the input to remove focus
-      const input = document.querySelector(
-        'input[type="text"]'
-      ) as HTMLInputElement;
-      if (input) input.blur();
-    }, 250); // 250ms animation duration for smoother feel
+    const input = document.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+    if (input) input.blur();
   };
 
   const highlightText = (text: string, query: string) => {
@@ -388,8 +383,8 @@ const SearchModal: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen  bg-gray-100 flex items-center justify-center p-2">
-      <div className="bg-white rounded-xl sm:rounded-3xl relative  shadow-lg w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl ">
+    <div className="min-h-screen bg-gray-100 px-2 flex items-center justify-center  sm:p-2">
+      <div className="bg-white rounded-xl  sm:rounded-2xl relative shadow-lg w-full sm:max-w-md md:max-w-lg lg:max-w-2xl">
         {/* Search Bar */}
         <div className="relative px-4 py-4 sm:px-8 mb-4 sm:mb-0">
       {/* Search / Loader Icon */}
@@ -690,16 +685,15 @@ const SearchModal: React.FC = () => {
         )}
 
         {/* Search Results */}
+        <AnimatePresence>
         {!isCleared && isFocused && (
-          <div
-            className={`px-4 transition-transform duration-500 sm:px-8  relative z-10 ${
+          <motion.div
+            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 18, scale: 0.98 }}
+            transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+            className={`px-4 sm:px-8 relative z-10 ${
               showSettings ? "pointer-events-none" : ""
-            } ${
-              isClearing
-                ? "opacity-0"
-                : isOpening
-                ? "opacity-0"
-                : "opacity-100"
             }`}
           >
              {showResults ? (
@@ -818,8 +812,9 @@ const SearchModal: React.FC = () => {
 })}
               </div>
             )}
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </div>
     </div>
   );
