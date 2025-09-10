@@ -395,7 +395,7 @@ const SearchModal: React.FC = () => {
       {/* Search / Loader Icon */}
       {isTyping ? (
         <div className=" absolute top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5">
-          <svg className="w-full h-full animate-spin" viewBox="0 0 24 24">
+          <svg className="w-full rotate-spin animate-spin h-full" viewBox="0 0 24 24">
             {/* <circle
               cx="12"
               cy="12"
@@ -413,7 +413,7 @@ const SearchModal: React.FC = () => {
               fill="none"
               strokeDasharray="62.83"
               strokeDashoffset="62.83"
-              className="animate-[borderFill_1s_ease-in-out_infinite] border-loader-circle"
+              className="rotate-spin animate-[spinner_1.2s_linear_infinite] spinner-circle"
             />
           </svg>
         </div>
@@ -692,7 +692,7 @@ const SearchModal: React.FC = () => {
         {/* Search Results */}
         {!isCleared && isFocused && (
           <div
-            className={`px-4 sm:px-8  relative z-10 ${
+            className={`px-4 transition-transform duration-500 sm:px-8  relative z-10 ${
               showSettings ? "pointer-events-none" : ""
             } ${
               isClearing
